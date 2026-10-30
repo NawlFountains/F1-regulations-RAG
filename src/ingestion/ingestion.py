@@ -13,18 +13,15 @@ def load_directory(directory_path):
     if not directory.is_dir():
         raise ValueError(f"{directory_path} is not a valid directory.")
     
-    extracted_texts = []
+    pages = []
     for file in directory.glob("*.pdf"):
-        extracted_texts.extend(extract_text(file))
+        pages.extend(extract_text(file))
     
-    return extracted_texts
+    return pages
 
 
-extracted_texts = load_directory("D:\programmingProyects\F1-Regulations-RAG\documents")
-
-regulations_texts = [text for text in extracted_texts if 'FIA 2026 F1 Regulations' in text['source']]
-
-print(f"Extracted {len(regulations_texts)} pages from FIA 2026 F1 Regulations.")
-
-print("Sample extracted text from the first page:")
-print(regulations_texts[0]['text'][:500])
+if __name__ == "__main__":
+    pages = load_directory(r"D:\programmingProyects\F1-Regulations-RAG\documents")
+    regs = [p for p in pages if "FIA 2026 F1 Regulations" in p["source"]]
+    print(f"Extracted {len(regs)} pages.")
+    print(regs[0]["text"][:500])
