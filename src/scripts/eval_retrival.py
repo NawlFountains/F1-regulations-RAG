@@ -39,12 +39,22 @@ if not client.collection_exists(COLLECTION):      # embed only on the first run
     chunks = split_into_clauses(pages)
     build_collection(client, chunks, embed_chunks(chunks))
 
-def recall_at_k(k, rerank):
+CONFIGS = {
+    "dense":          dict(),
+    "dense+rerank":   dict(rerank=True),
+    "hybrid":         dict(hybrid=True),
+    "hybrid+rerank":  dict(hybrid=True, rerank=True),
+}
+
+def recall_at_k(k, **opts):
     hits = 0
     for question, expected in EVAL:
-        top = [h.payload["article"] for h in retrieve(client, question, k, rerank)]
+        top = [h.payload["article"] for h in retrieve(client, question, k, **opts)]
         hits += expected in top
     return hits / len(EVAL)
 
 for k in (3, 5, 10):
-    print(k, "dense:", recall_at_k(k, False), "| reranked:", recall_at_k(k, True))
+    row = " | ".join(f"{name}: {recall_at_k(k, **opts):.2f}" for name, opts in CONFIGS.items())
+    print(k, row)
+
+client.close()
