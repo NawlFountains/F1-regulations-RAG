@@ -2,7 +2,11 @@
  
 A retrieval-augmented question-answering system over the **FIA 2026 Formula 1 Regulations** (Sections A-F). Ask a question in plain language and get an answer grounded in the regulations, with the clause IDs, document and page it came from.
  
-> **Status:** working end to end from the command line (ingestion, chunking, embeddings, vector search, LLM answers with citations). API, UI, automated answer evaluation and deployment are still to do. See [Roadmap](#roadmap).
+**Live demo: https://f1-regulations-rag.streamlit.app/**
+The free host puts apps to sleep after 12 hours without traffic, so the first load can take a minute.
+ 
+> **Status:** deployed and working end to end. Retrieval is measured (see below); answer quality has only been checked by hand so far, and automated answer evaluation is next. See the [Roadmap](#roadmap).
+
  
 ## How it works
  
@@ -16,8 +20,8 @@ question -> embed -> top-10 clauses -> prompt -> LLM -> answer + citations
 |---|---|---|
 | Ingestion | Reads every PDF into page records (`source`, `page`, `text`) | PyMuPDF |
 | Chunking | Splits the text into one chunk per numbered clause (`A2.1.4`, `C6.4.4`, ...) | regex on clause IDs |
-| Embeddings | Embeds each clause together with its parent section title | `BAAI/bge-base-en-v1.5` (CPU, normalized) |
-| Vector DB | Stores vectors plus metadata (document, clause ID, parent title, page, text) | Qdrant in local mode (saved to `qdrant_data/`) |
+| Embeddings | Embeds each clause together with its parent section title | `BAAI/bge-small-en-v1.5` (CPU, normalized) |
+| Vector DB | Stores vectors plus metadata (document, clause ID, parent title, page, text) | Qdrant: Cloud in the deployed app, a local folder for development |
 | Retrieval | Dense similarity search, top 10 clauses | Qdrant cosine search |
 | Prompt | Numbered clauses as context; the model may only use them and must cite clause IDs | `src/prompts` |
 | LLM | Generates the answer at temperature 0 | Groq, `gpt-oss-120b` |
@@ -55,7 +59,7 @@ Plain dense retrieval won at every k, so BM25 and the reranker are implemented b
  
 ## Project structure
  
-``
+```
 src/
   ingestion/    PDF -> page records, plus per-PDF index page counts
   chunking/     pages -> clause chunks
@@ -79,7 +83,7 @@ Requirements: Python 3.12 and a [Groq](https://console.groq.com) API key. No sep
 ```bash
 python -m venv .venv
 .venv\Scripts\activate            # Windows
-pip install -r requirements.txt
+pip install -r requirements-dev.txt    # requirements.txt alone is enough to run the app
 ```
  
 1. Put the regulation PDFs in `documents/`.
@@ -124,13 +128,15 @@ pytest -v
  
 ## Known limitations
  
-- Qdrant local mode allows only one process to open `qdrant_data/` at a time, so the chat loop, the evaluation script and any future API cannot run simultaneously. Switching to a Qdrant server (Docker or Qdrant Cloud) removes this and only changes `get_client()`.
 - Questions are answered independently; there is no conversation memory, so follow-ups like "and for the sprint?" do not work yet.
 - The appendices with general definitions are not indexed. Definitions are not numbered clauses and need their own chunking (one chunk per term).
 - Citations name the document, clause ID, parent section and page. The `ARTICLE` heading names (for example "A5: General roles and responsibilities") are not captured as metadata yet.
-- Index page counts are hardcoded per PDF, so a new issue of a document needs its entry updated.
 - Page headers and footers are not stripped from the text, and a clause that crosses a page break can carry that noise.
-- The evaluation covers retrieval only. Answer quality has been read by hand, not measured.
+- Index page counts are hardcoded per PDF, so a new issue of a document needs its entry updated.
+- The evaluation covers retrieval only, with 13 questions. Answer quality has been read by hand, not measured.
+- The demo shares one Groq key, so heavy use can hit rate limits.
+- In local mode, Qdrant allows only one process to open `qdrant_data/` at a time, so the app, the chat loop and the evaluation script cannot run together. Using Qdrant Cloud removes this.
+
 ## Roadmap
  
 - [ ] Measure answer quality with RAGAS (faithfulness, answer relevancy) plus a deterministic check that the expected clause is cited
@@ -138,7 +144,6 @@ pytest -v
 - [ ] Capture article names as metadata and show them in citations
 - [ ] Strip repeated headers and footers before chunking
 - [ ] Grow the evaluation set and add out-of-scope questions (the bot should answer that the regulations do not cover them)
-- [ ] Deploy the Streamlit app (Qdrant Cloud for the vectors; test `bge-small` to fit a free host)
+- [x] Deploy the Streamlit app (Qdrant Cloud for the vectors; test `bge-small` to fit a free host)
+- [ ] Optional: conversation memory for follow-up questions
 - [ ] Optional: FastAPI `POST /ask` endpoint returning the answer and its sources (the UI calls `ask()` directly)
- 
-
