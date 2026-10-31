@@ -39,7 +39,18 @@ A hand-written set of 13 questions, each paired with the clause that answers it,
 | Dense + cross-encoder rerank (`bge-reranker-base`) | 0.54 | 0.62 | 0.85 |
 | Hybrid (dense + BM25, RRF fusion) | 0.62 | 0.69 | 0.85 |
 | Hybrid + rerank | 0.54 | 0.54 | 0.77 |
+
+> bge-base-en-v1.5
  
+| Configuration | recall@3 | recall@5 | recall@10 |
+|---|---|---|---|
+| **Dense only (used)** | **0.69** | **0.85** | **1.0** |
+| Dense + cross-encoder rerank (`bge-reranker-base`) | 0.62 | 0.62 | 0.77 |
+| Hybrid (dense + BM25, RRF fusion) | 0.62 | 0.62 | 0.92 |
+| Hybrid + rerank | 0.54 | 0.54 | 0.69 |
+
+> bge-small-en-v1.5
+
 Plain dense retrieval won at every k, so BM25 and the reranker are implemented but switched off. Each question is worth about 8 points, so treat differences of one or two questions with caution; the set should grow before drawing fine conclusions.
  
 ## Project structure

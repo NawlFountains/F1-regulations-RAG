@@ -1,5 +1,5 @@
 .venv
-.venv-tes
+.venv-test
 .env
 __pycache__
 qdrant_data/
