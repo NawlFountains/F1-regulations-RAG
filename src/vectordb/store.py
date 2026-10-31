@@ -1,12 +1,18 @@
+import os
+from dotenv import load_dotenv
 from pathlib import Path
 from qdrant_client import QdrantClient, models
 
 COLLECTION = "f1_regs"
 ROOT = Path(__file__).resolve().parents[2]     
 
-def get_client(path=ROOT / "qdrant_data"):
-    return QdrantClient(path=str(path))
+load_dotenv(ROOT / ".env")
 
+def get_client():
+    url = os.getenv("QDRANT_URL")
+    if url:
+        return QdrantClient(url=url, api_key=os.getenv("QDRANT_API_KEY"))
+    return QdrantClient(path=str(ROOT / "qdrant_data"))
 def build_collection(client, chunks, embs):
     if client.collection_exists(COLLECTION):
         client.delete_collection(COLLECTION)

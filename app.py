@@ -8,10 +8,10 @@ from src.vectordb.store import COLLECTION
 
 st.set_page_config(page_title="F1 Regulations RAG", page_icon="🏁")
 
-# On Streamlit Cloud the key comes from st.secrets; locally it comes from .env
 try:
-    if "GROQ_API_KEY" in st.secrets:
-        os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+    for key in ("GROQ_API_KEY", "QDRANT_URL", "QDRANT_API_KEY"):
+        if key in st.secrets:
+            os.environ[key] = st.secrets[key]
 except Exception:
     pass
 

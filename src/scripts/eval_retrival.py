@@ -1,9 +1,9 @@
 import numpy as np
-from ingestion.ingestion import load_directory
-from chunking.chunking import split_into_clauses
-from embeddings.embedder import embed_chunks, embed_query
-from vectordb.store import get_client, build_collection, COLLECTION
-from retrieval.retriver import retrieve
+from src.ingestion.ingestion import load_directory
+from src.chunking.chunking import split_into_clauses
+from src.embeddings.embedder import embed_chunks, embed_query
+from src.vectordb.store import get_client, build_collection, COLLECTION
+from src.retrieval.retriver import retrieve
 
 EVAL = [
     ("What happens if two drivers finish with the same number of points?", "A2.1.4"),

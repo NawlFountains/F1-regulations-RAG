@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer
 
-MODEL_NAME = "BAAI/bge-base-en-v1.5"
+MODEL_NAME = "BAAI/bge-small-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
 _model = None
@@ -13,6 +13,7 @@ def get_model():
 
 def build_embed_text(chunk):
     # keys from your current chunker: "article" = clause ID, "section" = parent title
+    
     header = " - ".join(x for x in [chunk["article"], chunk.get("section")] if x)
     return f'{header}\n{chunk["text"]}'
 
