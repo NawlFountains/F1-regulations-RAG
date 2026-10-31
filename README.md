@@ -4,6 +4,8 @@ A retrieval-augmented question-answering system over the **FIA 2026 Formula 1 Re
  
 **Live demo: https://f1-regulations-rag.streamlit.app/**
 The free host puts apps to sleep after 12 hours without traffic, so the first load can take a minute.
+
+![Demo](docs/demo.PNG)
  
 > **Status:** deployed and working end to end. Retrieval is measured (see below); answer quality has only been checked by hand so far, and automated answer evaluation is next. See the [Roadmap](#roadmap).
 
