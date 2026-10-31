@@ -11,7 +11,7 @@ try:
             break
         try:
             result = ask(client, question)
-        except Exception as e:           # API errors, rate limits: keep the session alive
+        except Exception as e:      
             print(f"Error: {e}")
             continue
 
@@ -20,7 +20,7 @@ try:
             print(f'  [{s["clause"]}] {s["source"]}, p. {s["page"]}')
         if result["unverified_citations"]:
             print("\nWARNING, cited but not retrieved:", result["unverified_citations"])
-except (KeyboardInterrupt, EOFError):    # Ctrl+C or Ctrl+Z
+except (KeyboardInterrupt, EOFError):   
     pass
 finally:
     client.close()

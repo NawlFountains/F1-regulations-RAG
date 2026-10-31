@@ -1,9 +1,11 @@
+from pathlib import Path
 from qdrant_client import QdrantClient, models
 
 COLLECTION = "f1_regs"
+ROOT = Path(__file__).resolve().parents[2]     
 
-def get_client(path="qdrant_data"):
-    return QdrantClient(path=path)     # ":memory:" works too, but loses everything on exit
+def get_client(path=ROOT / "qdrant_data"):
+    return QdrantClient(path=str(path))
 
 def build_collection(client, chunks, embs):
     if client.collection_exists(COLLECTION):

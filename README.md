@@ -44,9 +44,9 @@ Plain dense retrieval won at every k, so BM25 and the reranker are implemented b
  
 ## Project structure
  
-```
+``
 src/
-  ingestion/    PDF -> page records
+  ingestion/    PDF -> page records, plus per-PDF index page counts
   chunking/     pages -> clause chunks
   embeddings/   embedding model wrapper
   vectordb/     Qdrant collection build and client
@@ -54,10 +54,12 @@ src/
   prompts/      system prompt and context formatting
   llm/          Groq client
   rag.py        ask(): retrieve -> prompt -> generate -> sources
-  scripts/      CLI chat loop and retrieval evaluation
+  scripts/      build_index, CLI chat loop and retrieval evaluation
+app.py          Streamlit UI
 tests/          pytest tests for the chunker
 documents/      the FIA regulation PDFs (input)
 ```
+
  
 ## Getting started
  
@@ -74,14 +76,21 @@ pip install -r requirements.txt
 ```
    GROQ_API_KEY=your_key_here
 ```
-3. Build the index. Qdrant runs inside the Python process and saves to the `qdrant_data/` folder, so there is nothing to start. The first run of the evaluation script embeds all clauses and stores them there (a few minutes on CPU); later runs reuse the stored vectors:
+3. Build the index. Qdrant runs inside the Python process and saves to the `qdrant_data/` folder, so there is nothing to start. This embeds all clauses and stores them there (about 4 minutes on CPU). Run it again whenever you change the chunker or the embedding model:
 ```bash
-   python -m src.scripts.eval_retrieval
+   python -m src.scripts.build_index
 ```
+
  
 ## Usage
  
-Interactive question loop (the embedding model loads once, then each question is fast):
+Web app (each cited clause expands to show the full rule text):
+ 
+```bash
+streamlit run app.py
+```
+ 
+Interactive question loop in the terminal (the embedding model loads once, then each question is fast):
  
 ```bash
 python -m src.scripts.ask
@@ -89,11 +98,18 @@ python -m src.scripts.ask
  
 Each answer prints the cited clauses with their document and page, plus a warning if the model cited a clause that was not in its context.
  
+Retrieval evaluation (recall@k for the dense, hybrid and reranked configurations):
+ 
+```bash
+python -m src.scripts.eval_retrieval
+```
+ 
 Run the chunker tests:
  
 ```bash
 pytest -v
 ```
+
  
 ## Known limitations
  
@@ -111,5 +127,7 @@ pytest -v
 - [ ] Capture article names as metadata and show them in citations
 - [ ] Strip repeated headers and footers before chunking
 - [ ] Grow the evaluation set and add out-of-scope questions (the bot should answer that the regulations do not cover them)
-- [ ] FastAPI `POST /ask` endpoint returning the answer and its sources
-- [ ] Web UI and deployment
+- [ ] Deploy the Streamlit app (Qdrant Cloud for the vectors; test `bge-small` to fit a free host)
+- [ ] Optional: FastAPI `POST /ask` endpoint returning the answer and its sources (the UI calls `ask()` directly)
+ 
+

@@ -1,8 +1,8 @@
 import re
 
-from retrieval.retriver import retrieve
-from prompts.prompt import build_messages, short_source
-from llm.client import generate
+from src.retrieval.retriver import retrieve
+from src.prompts.prompt import build_messages, short_source
+from src.llm.client import generate
 
 def cited_ids(text):
     ids = []
@@ -22,6 +22,7 @@ def ask(client, question, k=10):
             "source": short_source(by_id[c]["source"]),
             "section": by_id[c].get("section"),
             "page": by_id[c]["page_start"],
+            "text": by_id[c]["text"],
         }
         for c in cited if c in by_id
     ]

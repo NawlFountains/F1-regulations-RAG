@@ -2,8 +2,8 @@ import re
 import numpy as np
 from rank_bm25 import BM25Okapi
 from sentence_transformers import CrossEncoder
-from embeddings.embedder import embed_query, build_embed_text
-from vectordb.store import COLLECTION
+from src.embeddings.embedder import embed_query, build_embed_text
+from src.vectordb.store import COLLECTION
 
 _bm25 = None
 _reranker = None
