@@ -1,6 +1,10 @@
 from ingestion.ingestion import load_directory
 from chunking.chunking import split_into_clauses
 
+import numpy as np
+from embeddings.embedder import embed_chunks, embed_query, build_embed_text, get_model
+
+
 # Skip index pages, which are not part of the regulations text. The index page number is different for each PDF, so we need to hardcode it here.
 INDEX_PAGES = {
     "FIA 2026 F1 Regulations - Section A [General Provisions] - Iss 03 - 2026-06-25-1.pdf": 4,   # last index page
